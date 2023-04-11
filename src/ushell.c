@@ -1,8 +1,5 @@
 #include "ushell.h"
 
-#include <ctype.h>
-#include <string.h>
-
 #define ASCII_BACKSPACE 0x08
 #define ASCII_DEL 0x7f
 
@@ -19,12 +16,29 @@ static struct {
 	void (*putchar)(char chr);
 } ushell;
 
+static int ushell_strcmp(const char *lhs, const char *rhs);
+static size_t ushell_strlen(const char *str);
 static void ushell_print(const char *str);
 static void ushell_println(const char *str);
 static void ushell_print_help(void);
 static void ushell_receive(char c);
 static void ushell_parse(void);
 static void ushell_exec(void);
+
+int ushell_strcmp(const char *lhs, const char *rhs)
+{
+	while (*lhs && (*lhs == *rhs))
+		++lhs, ++rhs;
+	return *(const unsigned char *)lhs - *(const unsigned char *)rhs;
+}
+
+size_t ushell_strlen(const char *str)
+{
+	const char *s;
+	for (s = str; *s; ++s)
+		;
+	return (s - str);
+}
 
 void ushell_init(const ushell_command_t *commands, size_t commands_cnt,
 		 void (*ushell_putchar)(char chr))
@@ -38,7 +52,7 @@ void ushell_init(const ushell_command_t *commands, size_t commands_cnt,
 
 void ushell_print(const char *str)
 {
-	unsigned long len = strlen(str);
+	unsigned long len = ushell_strlen(str);
 	unsigned long i;
 	for (i = 0; i < len; ++i)
 		ushell.putchar(str[i]);
@@ -139,12 +153,12 @@ void ushell_exec(void)
 		return;
 
 	for (i = 0; i < ushell.commands_cnt; ++i) {
-		if (!strcmp(ushell.commands[i].name, ushell.argv[0])) {
+		if (!ushell_strcmp(ushell.commands[i].name, ushell.argv[0])) {
 			command_found = 1;
 			ushell.commands[i].func(ushell.argc, ushell.argv);
 		}
 	}
-	if (!strcmp("help", ushell.argv[0])) {
+	if (!ushell_strcmp("help", ushell.argv[0])) {
 		command_found = 1;
 		ushell_print_help();
 	}
