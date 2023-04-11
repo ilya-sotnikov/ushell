@@ -70,19 +70,36 @@ void ushell_receive(char chr)
 		return;
 	}
 
-	if ((chr == '\r' || chr == '\n')) {
-		if (ushell.rx_ptr != 0) {
+	switch (chr) {
+	case '\r':
+	case '\n':
+		if (ushell.rx_ptr > 0) {
 			ushell_print("\r\n");
+			if (ushell.rx[ushell.rx_ptr - 1] == ' ')
+				ushell.rx[ushell.rx_ptr - 1] = '\0';
 			ushell.rx[ushell.rx_ptr++] = '\0';
 		}
-	} else if (chr == ASCII_BACKSPACE || chr == ASCII_DEL) {
-		if (ushell.rx_ptr != 0) {
+		break;
+
+	case ASCII_BACKSPACE:
+	case ASCII_DEL:
+		if (ushell.rx_ptr > 0) {
 			--ushell.rx_ptr;
 			ushell_print("\b \b");
 		}
-	} else {
+		break;
+
+	case ' ':
+		if (ushell.rx_ptr > 0 && ushell.rx[ushell.rx_ptr - 1] != ' ') {
+			ushell.rx[ushell.rx_ptr++] = chr;
+			ushell.putchar(chr);
+		}
+		break;
+
+	default:
 		ushell.rx[ushell.rx_ptr++] = chr;
 		ushell.putchar(chr);
+		break;
 	}
 }
 
@@ -91,19 +108,15 @@ void ushell_parse(void)
 	int i;
 	unsigned long arg_pos;
 
-	if (((ushell.rx_ptr > 0) && (ushell.rx[ushell.rx_ptr - 1] != '\0')) ||
-	    (ushell.rx_ptr == 0)) {
+	if (ushell.rx_ptr == 0)
 		return;
-	}
+
+	if ((ushell.rx_ptr > 0) && (ushell.rx[ushell.rx_ptr - 1] != '\0'))
+		return;
 
 	arg_pos = 0;
 	for (i = 0; i < ushell.rx_ptr; ++i) {
 		if (ushell.rx[i] == ' ') {
-			if (i > 0 && ushell.rx[i - 1] == ' ') {
-				arg_pos = i + 1;
-				continue;
-			}
-
 			if (ushell.argc >= USHELL_ARGC_MAX) {
 				ushell_println("ushell: argc > ARGC_MAX");
 				return;
