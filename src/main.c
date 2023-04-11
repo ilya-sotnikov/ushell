@@ -62,6 +62,8 @@ void test_inputs(void)
 	const unsigned long long_str_len =
 		sizeof(long_str) / sizeof(long_str[0]);
 
+	PROCESS_STR("");
+
 	PROCESS_STR("add 1 2\n");
 	TEST_ASSERT_EQUAL(3, global_int);
 	global_int = 0;
@@ -70,7 +72,7 @@ void test_inputs(void)
 	TEST_ASSERT_EQUAL(5, global_int);
 	global_int = 0;
 
-	PROCESS_STR("add  5      1  \n");
+	PROCESS_STR("add   5      1  \n");
 	TEST_ASSERT_EQUAL(6, global_int);
 	global_int = 0;
 
@@ -99,14 +101,11 @@ void test_inputs(void)
 int main(void)
 {
 	const ushell_command_t commands[] = {
-
 		{ "print", "prints \"test\"", &print_string },
 		{ "add", "adds 2 ints", &add2ints },
-
 	};
-	const size_t commands_count = sizeof(commands) / sizeof(commands[0]);
 
-	ushell_init(commands, commands_count, &ushell_putchar);
+	USHELL_INIT(commands);
 
 	UNITY_BEGIN();
 

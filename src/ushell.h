@@ -17,9 +17,16 @@ typedef struct {
 	void (*const func)(int argc, char *argv[]);
 } ushell_command_t;
 
-void ushell_init(const ushell_command_t *commands, size_t commands_cnt,
-		 void (*ushell_putchar)(char chr));
+void ushell_putchar(char chr); /* define this function */
+void ushell_init(const ushell_command_t *commands, size_t commands_cnt);
 void ushell_process(char chr);
+
+#define USHELL_INIT(commands)                                   \
+	do {                                                    \
+		const size_t ushell_commands_count =            \
+			sizeof(commands) / sizeof(commands[0]); \
+		ushell_init(commands, ushell_commands_count);   \
+	} while (0)
 
 #ifdef __cplusplus
 }

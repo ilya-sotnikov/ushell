@@ -12,8 +12,6 @@ static struct {
 
 	const ushell_command_t *commands;
 	size_t commands_cnt;
-
-	void (*putchar)(char chr);
 } ushell;
 
 static int ushell_strcmp(const char *lhs, const char *rhs);
@@ -40,12 +38,10 @@ size_t ushell_strlen(const char *str)
 	return (s - str);
 }
 
-void ushell_init(const ushell_command_t *commands, size_t commands_cnt,
-		 void (*ushell_putchar)(char chr))
+void ushell_init(const ushell_command_t *commands, size_t commands_cnt)
 {
 	ushell.commands = commands;
 	ushell.commands_cnt = commands_cnt;
-	ushell.putchar = ushell_putchar;
 	ushell_print_help();
 	ushell_print(USHELL_PROMPT);
 }
@@ -55,7 +51,7 @@ void ushell_print(const char *str)
 	unsigned long len = ushell_strlen(str);
 	unsigned long i;
 	for (i = 0; i < len; ++i)
-		ushell.putchar(str[i]);
+		ushell_putchar(str[i]);
 }
 
 void ushell_println(const char *str)
@@ -106,13 +102,13 @@ void ushell_receive(char chr)
 	case ' ':
 		if (ushell.rx_ptr > 0 && ushell.rx[ushell.rx_ptr - 1] != ' ') {
 			ushell.rx[ushell.rx_ptr++] = chr;
-			ushell.putchar(chr);
+			ushell_putchar(chr);
 		}
 		break;
 
 	default:
 		ushell.rx[ushell.rx_ptr++] = chr;
-		ushell.putchar(chr);
+		ushell_putchar(chr);
 		break;
 	}
 }
