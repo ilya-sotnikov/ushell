@@ -29,13 +29,18 @@ void function_name(int argc, char *argv[]);
 ```
 5. Initialize ushell like this:
 ```C
-const ushell_command_t commands[] = {
+static const ushell_command_t commands[] = {
         { "test", "prints \"test\"", &test },
         { "print_args", "prints all args", &print_args },
         { "add2ints", "adds 2 int args", &add2ints },
 };
-USHELL_INIT(commands);
+ushell_init(commands, sizeof(commands) / sizeof(commands[0]));
 ```
+
+commands[] array should not be destroyed if it's allocated in a local stack frame so it's a good idea to add `static`.
+
+Also, since the array size is calculated using the sizeof operator, you should call ushell_init() where you declare commands[].
+
 5. Call this function when new data is available in the interface of your choice.
 ```C
 void ushell_process(char chr);
