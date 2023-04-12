@@ -26,13 +26,14 @@ void setup() {
   Serial.begin(9600);
   pinMode(LED_BUILTIN, OUTPUT);
   
+  // add static to ensure this array will not get destroyed
   // "name", "help string", function address
-  const ushell_command_t commands[] = {
+  static const ushell_command_t commands[] = {
     { "print_args", "prints all args", &print_args },
     { "toggle_led",  "toggle LED",     &toggle_led },
   };
 
-  USHELL_INIT(commands);
+  ushell_init(commands, sizeof(commands) / sizeof(commands[0]));
 }
 
 void loop() {

@@ -105,7 +105,7 @@ int main(void)
 		{ "add", "adds 2 ints", &add2ints },
 	};
 
-	USHELL_INIT(commands);
+	ushell_init(commands, sizeof(commands) / sizeof(commands[0]));
 
 	UNITY_BEGIN();
 
