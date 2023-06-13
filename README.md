@@ -48,7 +48,7 @@ void ushell_process(char chr);
 
 You can check examples from the "port" directory.
 
-If you are building it on PC using cmake it just runs tests in main.c. To build and run tests:
+If you are building it on PC using cmake it just runs tests in main.c. To build and run tests (using [Unity](https://www.throwtheswitch.org/unity)):
 
 1. `git clone https://github.com/ilya-sotnikov/ushell`
 2. `cd ushell`
